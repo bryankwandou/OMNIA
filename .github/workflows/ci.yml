@@ -23,7 +23,7 @@ jobs:
       run: npm ci
 
     - name: Lint Core Engine
-      run: npm run lint -w packages/core
+      run: npm run lint
 
     - name: Security Audit (npm audit)
       run: npm audit --audit-level=high
