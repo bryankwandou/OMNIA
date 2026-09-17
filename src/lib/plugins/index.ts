@@ -91,7 +91,10 @@ class ApiKeyAdapter implements ModelAdapter {
     });
 
     if (!res.ok) throw new Error(`OpenAI Error: ${res.statusText}`);
-    const data = (await res.json()) as any;
+    const data = (await res.json()) as {
+      choices: { finish_reason: AIResponse['finishReason']; message: { content: string } }[];
+      usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
+    };
 
     return {
       requestId: req.id,

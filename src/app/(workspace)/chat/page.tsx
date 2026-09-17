@@ -59,9 +59,10 @@ export default function ChatWorkspace() {
         m.id === assistantId ? { ...m, content: response.content, isStreaming: false } : m
       ));
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       setMessages(prev => prev.map(m =>
-        m.id === assistantId ? { ...m, content: `[SYSTEM ERROR] ${error.message}`, isStreaming: false } : m
+        m.id === assistantId ? { ...m, content: `[SYSTEM ERROR] ${message}`, isStreaming: false } : m
       ));
     } finally {
       setIsGenerating(false);

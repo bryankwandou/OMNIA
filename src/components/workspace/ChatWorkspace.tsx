@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { aiOrchestrator } from '@/lib/orchestrator';
 import { useOmniaStore } from '@/store/useOmniaStore';
+import { AIRequest, ExecutionMode } from '@/types';
 
 export function ChatWorkspace() {
     const { selectedModel, executionMode, setMode } = useOmniaStore();
@@ -25,13 +26,13 @@ export function ChatWorkspace() {
                 timestamp: Date.now(),
                 model: selectedModel,
                 mode: executionMode,
-                messages: [...messages, newMsg] as any
+                messages: [...messages, newMsg] as AIRequest['messages']
             });
 
             setMessages(p => [...p, { role: 'assistant', content: res.content }]);
-        } catch (err: any) {
+        } catch (err: unknown) {
             // Frontend Error State UI integration
-            setError(err.message || "Execution Failed.");
+            setError(err instanceof Error ? err.message : "Execution Failed.");
             setMessages(p => [...p, { role: 'system', content: "System halted due to error." }]);
         }
     };
@@ -46,7 +47,7 @@ export function ChatWorkspace() {
                     <select
                         className="bg-white/5 border border-white/10 rounded px-3 py-1 text-sm outline-none"
                         value={executionMode}
-                        onChange={(e) => setMode(e.target.value as any)}
+                        onChange={(e) => setMode(e.target.value as ExecutionMode)}
                     >
                         <option value="LOCAL">Local (Zero Cost)</option>
                         <option value="FREE_CLOUD">Free Cloud (Queued)</option>

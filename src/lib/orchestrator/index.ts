@@ -76,7 +76,7 @@ export class Orchestrator {
     console.warn(`Primary failed. Checking fallback... Error: ${originalError.message}`);
 
     // Prevent infinite loop
-    if ((request as any)._hasFallenBack) {
+    if ((request as AIRequest & { _hasFallenBack?: boolean })._hasFallenBack) {
       throw new Error(`Execution failed permanently: ${originalError.message}`);
     }
 

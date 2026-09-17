@@ -5,7 +5,13 @@ import { NextResponse } from 'next/server';
 export const runtime = 'edge';
 
 // Pseudo DB for Job Polling
-const JOB_DB = new Map<string, any>();
+interface JobRecord {
+  status: string;
+  user: string;
+  request: unknown;
+  result?: { content: string };
+}
+const JOB_DB = new Map<string, JobRecord>();
 
 async function verifyAuth(request: Request) {
   // Auth skeleton: Expects a Bearer token or session cookie
@@ -29,12 +35,13 @@ export async function POST(request: Request) {
 
     // 3. Return Job ID immediately to avoid Vercel 10s timeout
     return NextResponse.json({ jobId, status: 'QUEUED' }, { status: 202 });
-  } catch (e: any) {
+  } catch (e: unknown) {
     // 4. Error Normalization
+    const message = e instanceof Error ? e.message : 'Internal Queue Error';
     return NextResponse.json({
       error: {
-        code: e.message === 'Unauthorized' ? 401 : 500,
-        message: e.message || 'Internal Queue Error'
+        code: message === 'Unauthorized' ? 401 : 500,
+        message
       }
     }, { status: 400 });
   }
